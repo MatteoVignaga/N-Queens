@@ -7,7 +7,7 @@ from pygame import Vector2
 from win32api import mouse_event
 
 #board will be nxn, queens will be an n sized list
-n = 10
+n = 20
 square_size = 600/n
 max_steps = 1000
 colors = {
