@@ -13,7 +13,8 @@ max_steps = 1000
 colors = {
     "GRAY": (200, 200, 200),
     "GREEN": (0, 100, 0),
-    "BLACK": (70, 70, 70)
+    "BLACK": (70, 70, 70),
+    "LOCK GRAY": (180, 180, 180)
 }
 
 def generate_queens():
@@ -27,9 +28,12 @@ def place_queens(queens, board):
 
 def reset():
     board = [[0 for _ in range(n)] for _ in range(n)]
+    constraints_board = [[0 for _ in range(n)] for _ in range(n)]
     queens = generate_queens()
     place_queens(queens, board)
-    return board, queens
+    for queen in queens:
+        lock_cells(constraints_board, queen)
+    return board, constraints_board, queens
 
 
 def count_same_row_queens(queen, board):
@@ -72,6 +76,56 @@ def count_conflicts(queen, board):
     return same_row + same_column + same_diagonal + same_antidiagonal
 
 
+def lock_same_row(constraints_board, queen):
+    row_index = int(queen.y)
+    for col_index in range(len(constraints_board[row_index])):
+        constraints_board[row_index][col_index] -= 1
+
+
+def lock_same_column(constraints_board, queen):
+    col_index = int(queen.x)
+    for row_index in range(len(constraints_board)):
+        constraints_board[row_index][col_index] -= 1
+
+
+def lock_same_diagonal_and_antidiagonal(constraints_board, queen):
+    for r in range(len(constraints_board)):
+        for c in range(len(constraints_board)):
+            if (r - c == queen.y - queen.x) or (r + c == queen.y + queen.x):
+                constraints_board[r][c] -= 1
+
+
+def lock_cells(constraints_board, queen):
+    lock_same_row(constraints_board, queen)
+    lock_same_column(constraints_board, queen)
+    lock_same_diagonal_and_antidiagonal(constraints_board, queen)
+
+
+def unlock_same_row(constraints_board, queen):
+    row_index = int(queen.y)
+    for col_index in range(len(constraints_board[row_index])):
+        constraints_board[row_index][col_index] += 1
+
+
+def unlock_same_column(constraints_board, queen):
+    col_index = int(queen.x)
+    for row_index in range(len(constraints_board)):
+        constraints_board[row_index][col_index] += 1
+
+
+def unlock_same_diagonal_and_antidiagonal(constraints_board, queen):
+    for r in range(len(constraints_board)):
+        for c in range(len(constraints_board)):
+            if (r - c == queen.y - queen.x) or (r + c == queen.y + queen.x):
+                constraints_board[r][c] += 1
+
+
+def unlock_cells(constraints_board, queen):
+    unlock_same_row(constraints_board, queen)
+    unlock_same_column(constraints_board, queen)
+    unlock_same_diagonal_and_antidiagonal(constraints_board, queen)
+
+
 def update_conflicted(queens, board):
     return [queen for queen in queens if count_conflicts(queen, board) > 0]
 
@@ -89,22 +143,26 @@ def choose_new_position(queen, board):
     return Vector2(min[0], min[1])
 
 
-def show_board(board):
+def draw_board(board, constraints_board):
     board_size = (600, 600)
     grid = pygame.Rect(0, 0, board_size[0], board_size[1])
     grid.center = (int(display.get_width() / 2), int(display.get_height() / 2))
-    pygame.draw.rect(display, colors["BLACK"], grid, 3)
 
     for i in range(len(board)):
         for ii in range (len(board[i])):
             square = pygame.Rect(0, 0, square_size, square_size)
             square.topleft = (int(grid.topleft[0] + square_size*ii), int(grid.topleft[1] + square_size*i))
-            if board[i][ii] == 1: pygame.draw.rect(display, colors["GREEN"], square)
+            if board[i][ii] == 1:
+                pygame.draw.rect(display, colors["GREEN"], square)
+            elif constraints_board[i][ii] < 0:
+                pygame.draw.rect(display, colors["LOCK GRAY"], square)
             pygame.draw.rect(display, colors["BLACK"], square, 1)
 
+    pygame.draw.rect(display, colors["BLACK"], grid, 3)
 
 
-def min_conflicts(max_steps, board, queens):
+
+def min_conflicts(max_steps, board, constraints_board, queens):
     for i in range(max_steps):
         #goal check
         conflicted = update_conflicted(queens, board)
@@ -118,14 +176,16 @@ def min_conflicts(max_steps, board, queens):
 
         #move the queen to that position
         old_pos = queen
+        unlock_cells(constraints_board, old_pos)
         board[int(old_pos.y)][int(old_pos.x)] = 0
         queen.y = new_pos.y
         queen.x = new_pos.x
         board[int(new_pos.y)][int(new_pos.x)] = 1
+        lock_cells(constraints_board, new_pos)
 
         #show board at each step
         display.fill(colors["GRAY"])
-        show_board(board)
+        draw_board(board, constraints_board)
         pygame.display.flip()
         time.sleep(0.1)
     return None
@@ -151,11 +211,14 @@ def main():
     clock = pygame.time.Clock()
 
     # empty board
-    board = [[0 for _ in range(n)] for _ in range(n)]
+    board = [[0 for _ in range(n)] for _ in range(n)] #board to place queens on
+    constraints_board = [[0 for _ in range(n)] for _ in range(n)] #board to show locked cells
     # generate queens in random spots: place one queen per column at a random height
     queens = generate_queens()
     # place the queens on the board
     place_queens(queens, board)
+    for queen in queens:
+        lock_cells(constraints_board, queen)
 
     #start button
     start_button_rect = pygame.Rect(20, 20, 100, 40)
@@ -167,12 +230,12 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button_rect.collidepoint(event.pos):
-                    res = min_conflicts(max_steps, board, queens)
+                    res = min_conflicts(max_steps, board, constraints_board, queens)
                     if res is None: print("The algorithm stopped without being able to solve the CSP.")
-                if reset_button_rect.collidepoint(event.pos): board, queens = reset()
+                if reset_button_rect.collidepoint(event.pos): board, constraints_board, queens = reset()
 
         display.fill(colors["GRAY"])
-        show_board(board)
+        draw_board(board, constraints_board)
         draw_start_button(start_button_rect)
         draw_reset_button(reset_button_rect)
         pygame.display.flip()
