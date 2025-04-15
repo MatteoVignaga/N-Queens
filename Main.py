@@ -1,4 +1,5 @@
 import random
+import string
 import time
 from math import floor
 
@@ -7,6 +8,7 @@ from pygame import Vector2
 from win32api import mouse_event
 
 #board will be nxn, queens will be an n sized list
+#queens are represented as a couple (x,y) representing their coordinates
 n = 20
 square_size = 600/n
 max_steps = 1000
@@ -17,10 +19,11 @@ colors = {
     "LOCK GRAY": (180, 180, 180)
 }
 
+#queens are represented by x-column and y-row coordinates
 def generate_queens():
     return [Vector2(i, random.randint(0, n - 1)) for i in range(n)]
 
-
+#board is printed row by row!
 def place_queens(queens, board):
     for queen in queens:
         board[floor(queen.y)][floor(queen.x)] = 1
@@ -146,7 +149,7 @@ def choose_new_position(queen, board):
 def draw_board(board, constraints_board):
     board_size = (600, 600)
     grid = pygame.Rect(0, 0, board_size[0], board_size[1])
-    grid.center = (int(display.get_width() / 2), int(display.get_height() / 2))
+    grid.center = (int(display.get_width() / 2) + 100, int(display.get_height() / 2))
 
     for i in range(len(board)):
         for ii in range (len(board[i])):
@@ -162,7 +165,16 @@ def draw_board(board, constraints_board):
 
 
 
-def min_conflicts(max_steps, board, constraints_board, queens):
+def min_conflicts(max_steps, board, constraints_board):
+    # generate queens in random spots: place one queen per column at a random height
+    queens = generate_queens()
+    # place the queens on the board
+    place_queens(queens, board)
+    for queen in queens:
+        lock_cells(constraints_board, queen)
+    time.sleep(0.1)
+
+    #solve
     for i in range(max_steps):
         #goal check
         conflicted = update_conflicted(queens, board)
@@ -191,18 +203,22 @@ def min_conflicts(max_steps, board, constraints_board, queens):
     return None
 
 
-def draw_start_button(button_rect):
+def draw_start_button(button_rect, label: string):
     pygame.draw.rect(display, colors["BLACK"], button_rect, 3, 3)
-    font = pygame.font.Font(None, 30)
-    text = font.render("start", True, colors["BLACK"])
-    display.blit(text, (button_rect.x + 25, button_rect.y + 10))
+    font = pygame.font.Font(None, 25)
+    text = font.render(label, True, colors["BLACK"])
+    display.blit(text, (button_rect.x + 10, button_rect.y + 10))
 
 
 def draw_reset_button(button_rect):
     pygame.draw.rect(display, colors["BLACK"], button_rect, 3, 3)
-    font = pygame.font.Font(None, 30)
+    font = pygame.font.Font(None, 25)
     text = font.render("reset", True, colors["BLACK"])
     display.blit(text, (button_rect.x + 25, button_rect.y + 10))
+
+
+def backtracking_search():
+    print("You wanna go with backtracking search?")
 
 
 def main():
@@ -213,31 +229,29 @@ def main():
     # empty board
     board = [[0 for _ in range(n)] for _ in range(n)] #board to place queens on
     constraints_board = [[0 for _ in range(n)] for _ in range(n)] #board to show locked cells
-    # generate queens in random spots: place one queen per column at a random height
-    queens = generate_queens()
-    # place the queens on the board
-    place_queens(queens, board)
-    for queen in queens:
-        lock_cells(constraints_board, queen)
 
     #start button
-    start_button_rect = pygame.Rect(20, 20, 100, 40)
-    reset_button_rect = pygame.Rect(20, 80, 100, 40)
+    start_minconflicts_button_rect = pygame.Rect(20, 50, 200, 40)
+    start_backtracking_search_button_rect = pygame.Rect(20, 110, 200, 40)
+    reset_button_rect = pygame.Rect(20, 170, 200, 40)
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button_rect.collidepoint(event.pos):
-                    res = min_conflicts(max_steps, board, constraints_board, queens)
+                if start_minconflicts_button_rect.collidepoint(event.pos):
+                    res = min_conflicts(max_steps, board, constraints_board)
                     if res is None: print("The algorithm stopped without being able to solve the CSP.")
+                if start_backtracking_search_button_rect.collidepoint(event.pos):
+                    res = backtracking_search()
                 if reset_button_rect.collidepoint(event.pos): board, constraints_board, queens = reset()
 
         display.fill(colors["GRAY"])
         draw_board(board, constraints_board)
-        draw_start_button(start_button_rect)
-        draw_reset_button(reset_button_rect)
+        draw_start_button(start_minconflicts_button_rect, "minconflicts")
+        draw_start_button(start_backtracking_search_button_rect, "backtracking search")
+        #draw_reset_button(reset_button_rect)
         pygame.display.flip()
         clock.tick(1)
 
