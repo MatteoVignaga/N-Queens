@@ -2,7 +2,6 @@ import random
 import string
 import time
 
-import pygame
 from pygame import Vector2
 
 from BacktrackingSearch import BacktrackingSearch
