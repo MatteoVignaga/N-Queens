@@ -4,28 +4,27 @@ from BacktrackingSearch import BacktrackingSearch
 from MinConflicts import MinConflicts
 from utils import *
 
-def reset():
+def reset(display):
     board = [[0 for _ in range(n)] for _ in range(n)]
     constraints_board = [[0 for _ in range(n)] for _ in range(n)]
-    queens = generate_queens()
-    place_queens(queens, board)
-    for queen in queens:
-        lock_cells(constraints_board, queen)
-    return board, constraints_board, queens
+    draw_board(board, constraints_board, display)
+    return board, constraints_board
 
 
 def draw_start_button(button_rect, label: string):
     pygame.draw.rect(display, colors["BLACK"], button_rect, 3, 3)
     font = pygame.font.Font(None, 25)
     text = font.render(label, True, colors["BLACK"])
-    display.blit(text, (button_rect.x + 10, button_rect.y + 10))
+    text_rect = text.get_rect(center=button_rect.center)
+    display.blit(text, text_rect)
 
 
 def draw_reset_button(button_rect):
     pygame.draw.rect(display, colors["BLACK"], button_rect, 3, 3)
     font = pygame.font.Font(None, 25)
     text = font.render("reset", True, colors["BLACK"])
-    display.blit(text, (button_rect.x + 25, button_rect.y + 10))
+    text_rect = text.get_rect(center=button_rect.center)
+    display.blit(text, text_rect)
 
 
 def main():
@@ -55,13 +54,13 @@ def main():
                     algorithm = BacktrackingSearch(board, constraints_board, n, display)
                     res = algorithm.solve()
                     if not res: print("The algorithm stopped without being able to solve the CSP.")
-                if reset_button_rect.collidepoint(event.pos): board, constraints_board, queens = reset()
+                if reset_button_rect.collidepoint(event.pos): board, constraints_board = reset(display)
 
         display.fill(colors["GRAY"])
         draw_board(board, constraints_board, display)
         draw_start_button(start_minconflicts_button_rect, "minconflicts")
         draw_start_button(start_backtracking_search_button_rect, "backtracking search")
-        #draw_reset_button(reset_button_rect)
+        draw_reset_button(reset_button_rect)
         pygame.display.flip()
         clock.tick(1)
 
