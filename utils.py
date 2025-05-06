@@ -6,10 +6,10 @@ from pygame import Vector2
 
 # board will be nxn, queens will be an n sized list
 # queens are represented as a 2D vector (x,y) representing their coordinates
-n = 10                              # board size
+n = 30                              # board size
 square_size = 600/n                 # single cell size
 max_steps = 1000                    # iteration limit for MinConflicts
-delay = 0.1                         # time delay for each step of algorithms
+delay = 0.01                         # time delay for each step of algorithms
 colors = {
     "GRAY": (200, 200, 200),        # background color
     "GREEN": (0, 100, 0),           # queen position color
