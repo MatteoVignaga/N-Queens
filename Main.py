@@ -4,10 +4,6 @@ from BacktrackingSearch import BacktrackingSearch
 from MinConflicts import MinConflicts
 from utils import *
 
-#board will be nxn, queens will be an n sized list
-#queens are represented as a couple (x,y) representing their coordinates
-max_steps = 1000
-
 def reset():
     board = [[0 for _ in range(n)] for _ in range(n)]
     constraints_board = [[0 for _ in range(n)] for _ in range(n)]

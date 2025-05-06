@@ -17,7 +17,7 @@ class MinConflicts:
         place_queens(queens, self.board)
         for queen in queens:
             lock_cells(self.constraints_board, queen)
-        time.sleep(0.1)
+        time.sleep(delay)
 
         #solve
         for i in range(self.max_steps):
@@ -44,7 +44,7 @@ class MinConflicts:
             self.display.fill(colors["GRAY"])
             draw_board(self.board, self.constraints_board, self.display)
             pygame.display.flip()
-            time.sleep(0.1)
+            time.sleep(delay)
         return None
 
 

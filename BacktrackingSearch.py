@@ -35,7 +35,7 @@ class BacktrackingSearch:
             self.display.fill(colors["GRAY"])
             draw_board(board, constraints_board, self.display)
             pygame.display.flip()
-            time.sleep(0.001)
+            time.sleep(delay)
 
             res = self.backtrack(self.board, self.constraints_board, counter)
             if res: return res
@@ -49,7 +49,7 @@ class BacktrackingSearch:
             self.display.fill(colors["GRAY"])
             draw_board(board, constraints_board, self.display)
             pygame.display.flip()
-            time.sleep(0.001)
+            time.sleep(delay)
 
         return False
 
