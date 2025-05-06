@@ -1,14 +1,9 @@
 import heapq
 import time
-
-import pygame
-from pygame import Vector2
-
 from utils import *
 
 
 class BacktrackingSearch:
-
 
     def __init__(self, board, constraints_board, n, display):
         self.n = n
@@ -40,7 +35,7 @@ class BacktrackingSearch:
             self.display.fill(colors["GRAY"])
             draw_board(board, constraints_board, self.display)
             pygame.display.flip()
-            time.sleep(0.001)
+            time.sleep(delay)
 
             res = self.backtrack(self.board, self.constraints_board, counter)
             if res: return res
@@ -54,7 +49,7 @@ class BacktrackingSearch:
             self.display.fill(colors["GRAY"])
             draw_board(board, constraints_board, self.display)
             pygame.display.flip()
-            time.sleep(0.001)
+            time.sleep(delay)
 
         return False
 

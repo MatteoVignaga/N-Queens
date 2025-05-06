@@ -1,15 +1,31 @@
 from math import floor
 
 import pygame
+import random
+from pygame import Vector2
 
-n = 20
-square_size = 600/n
+# board will be nxn, queens will be an n sized list
+# queens are represented as a 2D vector (x,y) representing their coordinates
+n = 30                              # board size
+square_size = 600/n                 # single cell size
+max_steps = 1000                    # iteration limit for MinConflicts
+delay = 0.01                         # time delay for each step of algorithms
 colors = {
-    "GRAY": (200, 200, 200),
-    "GREEN": (0, 100, 0),
-    "BLACK": (70, 70, 70),
-    "LOCK GRAY": (180, 180, 180)
+    "GRAY": (200, 200, 200),        # background color
+    "GREEN": (0, 100, 0),           # queen position color
+    "BLACK": (70, 70, 70),          # border color
+    "LOCK GRAY": (180, 180, 180)    # constraints visualization color
 }
+
+def reset(display):
+    board = [[0 for _ in range(n)] for _ in range(n)]
+    constraints_board = [[0 for _ in range(n)] for _ in range(n)]
+    draw_board(board, constraints_board, display)
+    return board, constraints_board
+
+# queens are represented by x-column and y-row coordinates
+def generate_queens():
+    return [Vector2(i, random.randint(0, n - 1)) for i in range(n)]
 
 #board is printed row by row!
 def place_queens(queens, board):
