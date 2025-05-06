@@ -4,13 +4,6 @@ from BacktrackingSearch import BacktrackingSearch
 from MinConflicts import MinConflicts
 from utils import *
 
-def reset(display):
-    board = [[0 for _ in range(n)] for _ in range(n)]
-    constraints_board = [[0 for _ in range(n)] for _ in range(n)]
-    draw_board(board, constraints_board, display)
-    return board, constraints_board
-
-
 def draw_start_button(button_rect, label: string):
     pygame.draw.rect(display, colors["BLACK"], button_rect, 3, 3)
     font = pygame.font.Font(None, 25)

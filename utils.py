@@ -17,6 +17,12 @@ colors = {
     "LOCK GRAY": (180, 180, 180)    # constraints visualization color
 }
 
+def reset(display):
+    board = [[0 for _ in range(n)] for _ in range(n)]
+    constraints_board = [[0 for _ in range(n)] for _ in range(n)]
+    draw_board(board, constraints_board, display)
+    return board, constraints_board
+
 # queens are represented by x-column and y-row coordinates
 def generate_queens():
     return [Vector2(i, random.randint(0, n - 1)) for i in range(n)]
