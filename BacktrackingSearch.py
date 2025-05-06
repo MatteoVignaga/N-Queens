@@ -1,14 +1,9 @@
 import heapq
 import time
-
-import pygame
-from pygame import Vector2
-
 from utils import *
 
 
 class BacktrackingSearch:
-
 
     def __init__(self, board, constraints_board, n, display):
         self.n = n

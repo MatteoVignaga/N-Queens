@@ -1,6 +1,8 @@
 from math import floor
 
 import pygame
+import random
+from pygame import Vector2
 
 n = 20
 square_size = 600/n
@@ -10,6 +12,10 @@ colors = {
     "BLACK": (70, 70, 70),
     "LOCK GRAY": (180, 180, 180)
 }
+
+# queens are represented by x-column and y-row coordinates
+def generate_queens():
+    return [Vector2(i, random.randint(0, n - 1)) for i in range(n)]
 
 #board is printed row by row!
 def place_queens(queens, board):
